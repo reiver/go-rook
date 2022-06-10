@@ -10,6 +10,7 @@ const (
 	SYN = byte(0x16)
 )
 
+// DLEWrite writers ‘data’ to ‘w’, but does byte-stuffing to escape any bytes with a value DLE (0x10) or SYN (0x16).
 func DLEWrite(w io.Writer, data []byte) (int, error) {
 	if nil == w {
 		return 0, errNilWriter
