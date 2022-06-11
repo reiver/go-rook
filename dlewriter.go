@@ -2,6 +2,7 @@ package rook
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 )
 
@@ -36,31 +37,42 @@ func (receiver dleWriter) Write(data []byte) (int, error) {
 		return 0, errNilWriter
 	}
 
-	if 0 >= len(data) {
+	var lenData int = len(data)
+
+	if 0 >= lenData {
 		return 0, nil
 	}
 
-	var n int
-
+	var bufferLen int
 	var buffer bytes.Buffer
 	{
 		for _, b := range data {
 			switch b {
 			case dle, syn:
 				buffer.WriteByte(dle)
+				bufferLen++
 			}
 			buffer.WriteByte(b)
-			n++
+			bufferLen++
 		}
 	}
 
 	{
-		n2, err2 := w.Write(buffer.Bytes())
-		if nil != err2 {
-//@TODO: Shouldn't be using n2 here. Shouldn't could the byte-stuffing.
-			return n2, err2
+		n, err := w.Write(buffer.Bytes())
+		if nil != err {
+//@TODO: We shouldn't be using ‘n’ here, since it would have also counted the byte-stuffed DLEs; which is wrong since its value should be from the perspective of how many bytes of ‘data’ were written.
+			return n, err
+		}
+		{
+			expected := bufferLen
+			actual   := n
+
+			if expected != actual {
+//@TODO: We shouldn't be using ‘n’ here, since it would have also counted the byte-stuffed DLEs; which is wrong since its value should be from the perspective of how many bytes of ‘data’ were written.
+				return n, fmt.Errorf("actual number of bytes written (%d) is not what was expected (%d)", actual, expected)
+			}
 		}
 	}
 
-	return n, nil
+	return lenData, nil
 }
