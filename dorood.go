@@ -13,14 +13,14 @@ import (
 //
 //	"!DOROOD\u0085"
 func Dorood(w io.Writer) error {
-	if nil == conn {
+	if nil == w {
 		return nil
 	}
 
 	{
 		str := dclr.Dorood().String()
 
-		n, err := io.WriteString(conn, str)
+		n, err := io.WriteString(w, str)
 		if nil != err {
 			return err
 		}

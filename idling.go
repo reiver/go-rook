@@ -12,15 +12,15 @@ import (
 // I.e.,:
 //
 //	"!IDLING\u0085"
-func Idling(conn io.Writer) error {
-	if nil == conn {
+func Idling(w io.Writer) error {
+	if nil == w {
 		return nil
 	}
 
 	{
 		str := dclr.Idling().String()
 
-		n, err := io.WriteString(conn, str)
+		n, err := io.WriteString(w, str)
 		if nil != err {
 			return err
 		}
