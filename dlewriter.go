@@ -17,16 +17,16 @@ type dleWriter struct {
 
 var _ io.Writer = &dleWriter{}
 
-// Write writers ‘data’ to ‘w’, but does DLE byte-stuffing that escape any bytes with a value of DLE (0x10) or SYN (0x16).
+// Write writers ‘data’ to ‘w’, but does DLE byte-stuffing that escapes any bytes with a value of DLE (0x10) or SYN (0x16).
 //
 // For example, if ‘data’ is:
 //
-//	                                                 DLE                   SYN
+//	//                                               DLE                   SYN
 //	[]byte{0x00,0x02,0x04,0x08,0x1a,0x0c,0x0e,       0x10,0x12,0x14,       0x16,0x18,0x1a,0x1c,0x1e,0x20}
 //
 // Then what would be written to ‘w’ would be:
 //
-//	                                           DLE   DLE             DLE   SYN
+//	//                                         DLE   DLE             DLE   SYN
 //	[]byte{0x00,0x02,0x04,0x08,0x1a,0x0c,0x0e, 0x10, 0x10,0x12,0x14, 0x10, 0x16,0x18,0x1a,0x1c,0x1e,0x20}
 //
 func (receiver dleWriter) Write(data []byte) (int, error) {
