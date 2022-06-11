@@ -1,8 +1,6 @@
-package rook_test
+package rook
 
 import (
-	"github.com/reiver/go-rook"
-
 	"bytes"
 	"io"
 	"reflect"
@@ -10,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestDLEWrite(t *testing.T) {
+func TestDLEWriter_Write(t *testing.T) {
 
 	tests := []struct{
 		Data []byte
@@ -188,17 +186,34 @@ func TestDLEWrite(t *testing.T) {
 		var buffer bytes.Buffer
 		var w io.Writer = &buffer
 
-		rook.DLEWrite(w, test.Data)
+		var byteStuffer dleWriter = dleWriter{w}
+
+		n, err := byteStuffer.Write(test.Data)
+		if nil != err {
+			t.Errorf("For test #%d, did not expect an error but actually got one.", testNumber)
+			t.Logf("ERROR: (%T) %s", err, err)
+			continue
+		}
+		{
+			expected := len(test.Data)
+			actual   := n
+
+			if expected != actual {
+				t.Errorf("For test #%d, the actual value, for the number-of-bytes-written was not what was expected.", testNumber)
+				t.Logf("EXPECTED: %d", expected)
+				t.Logf("ACTUAL:   %d", actual)
+				continue
+			}
+		}
 
 		expected := test.Expected
 		actual   := buffer.Bytes()
 
 		if !reflect.DeepEqual(expected, actual) {
-			t.Errorf("For test #%d, the actual value was not what was expected.", testNumber)
+			t.Errorf("For test #%d, the actual value, of what was actually written, was not what was expected.", testNumber)
 			t.Logf("EXPECTED: %#v", expected)
 			t.Logf("ACTUAL:   %#v", actual)
 			continue
 		}
 	}
 }
-
